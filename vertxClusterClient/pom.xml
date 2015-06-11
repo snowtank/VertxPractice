@@ -9,12 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>vertxTest1</artifactId>
+    <artifactId>vertxClusterClient</artifactId>
     <packaging>jar</packaging>
 
     <properties>
-        <main.class>me.zcx.vertx.test1.VertxTest1</main.class>
-        <main.verticle>me.zcx.vertx.test1.VertxTest1</main.verticle>
+        <main.class>me.zcx.vertx.cluster.client.VertxClusterMain</main.class>
+        <main.verticle>me.zcx.vertx.cluster.client.ClusterClient</main.verticle>
     </properties>
 
     <dependencies>
