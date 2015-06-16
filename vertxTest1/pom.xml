@@ -23,6 +23,11 @@
             <artifactId>vertx-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-codegen</artifactId>
+        </dependency>
+
         <!-- Add hazelcast deps if you want it clusterable -->
         <dependency>
             <groupId>io.vertx</groupId>

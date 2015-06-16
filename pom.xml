@@ -29,6 +29,12 @@
                 <version>${vertx.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-codegen</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+
             <!-- Add hazelcast deps if you want it clusterable -->
             <dependency>
                 <groupId>io.vertx</groupId>
