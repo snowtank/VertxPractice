@@ -13,9 +13,7 @@ public class ClusterServer extends AbstractVerticle {
         EventBus eventBus = vertx.eventBus();
         vertx.setPeriodic(5000, timer -> {
             System.out.println("send message");
-            eventBus.send("message.test", "Yay! Someone kicked a ball", ar -> {
-                System.out.println("send result  = " + ar.succeeded());
-            });
+            eventBus.send("message.test", "Yay! Someone kicked a ball");
         });
     }
 

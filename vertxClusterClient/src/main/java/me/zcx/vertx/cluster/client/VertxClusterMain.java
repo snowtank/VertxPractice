@@ -14,6 +14,8 @@ import io.vertx.spi.cluster.impl.hazelcast.HazelcastClusterManager;
 public class VertxClusterMain {
     public static void main(String[] args) {
 
+        System.setProperty("vertx.cluster.public.host","192.168.2.1");
+        System.setProperty("vertx.cluster.public.port","30000");
 //        VertxOptions options = new VertxOptions()
 //                .setClustered(true)
 //                .setClusterHost("192.168.1.2")
@@ -25,7 +27,7 @@ public class VertxClusterMain {
         network.setPort(5701)
                 .setPortAutoIncrement(false)
                 .setPublicAddress("192.168.2.1")
-                .addOutboundPortDefinition("30000")
+                //.addOutboundPortDefinition("30000")
                 .setReuseAddress(true);
 
         JoinConfig join = network.getJoin();
@@ -39,6 +41,8 @@ public class VertxClusterMain {
 
         VertxOptions options = new VertxOptions()
                 .setClusterManager(mgr)
+                .setClusterHost("0.0.0.0")
+                .setClusterPort(30000)
                 .setClustered(true);
 
         Vertx.clusteredVertx(options, res -> {
