@@ -11,6 +11,7 @@
         <module>vertxTest1</module>
         <module>vertxClusterServer</module>
         <module>vertxClusterClient</module>
+        <module>vertxCommon</module>
     </modules>
 
     <packaging>pom</packaging>
