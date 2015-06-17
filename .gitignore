@@ -62,4 +62,4 @@ $RECYCLE.BIN/
 .idea
 *.iml
 target/
-
+.vertx/

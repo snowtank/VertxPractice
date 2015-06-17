@@ -12,6 +12,7 @@
         <module>vertxClusterServer</module>
         <module>vertxClusterClient</module>
         <module>vertxCommon</module>
+        <module>vertxHttpTest</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -33,6 +34,12 @@
             <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-codegen</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-web</artifactId>
                 <version>${vertx.version}</version>
             </dependency>
 
