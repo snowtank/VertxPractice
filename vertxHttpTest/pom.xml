@@ -40,6 +40,16 @@
             <artifactId>vertx-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-sql-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-mysql-postgresql-client</artifactId>
+        </dependency>
+
         <!-- Add hazelcast deps if you want it clusterable -->
         <dependency>
             <groupId>io.vertx</groupId>

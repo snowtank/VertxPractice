@@ -43,6 +43,25 @@
                 <version>${vertx.version}</version>
             </dependency>
 
+            <!-- 数据库依赖 -->
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-sql-common</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-mysql-postgresql-client</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-jdbc-client</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+
             <!-- Add hazelcast deps if you want it clusterable -->
             <dependency>
                 <groupId>io.vertx</groupId>
