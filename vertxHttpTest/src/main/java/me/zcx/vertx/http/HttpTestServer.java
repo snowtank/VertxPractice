@@ -85,45 +85,48 @@ public class HttpTestServer extends AbstractVerticle {
                             client.getNow(sourceURL.getPort() != -1 ? sourceURL.getPort() : sourceURL.getDefaultPort(),
                                     sourceURL.getHost(),
                                     sourceURL.getPath(),
-                                    resp1 -> resp1.bodyHandler(a -> {
-                                        try {
-                                            AsyncFile output = vertx.fileSystem().openBlocking(savePath + fileName, new OpenOptions());
-                                            output.write(a);
-                                            output.close();
+                                    resp1 -> {
+                                        System.out.println(resp1.statusCode());
 
-                                            sqlClient.getConnection(c -> {
-                                                if (c.succeeded()) {
-                                                    SQLConnection connection = c.result();
+                                        resp1.bodyHandler(a -> {
+                                            try {
+                                                AsyncFile output = vertx.fileSystem().openBlocking(savePath + fileName, new OpenOptions());
+                                                output.write(a);
+                                                output.close();
 
-                                                    JsonArray params = new JsonArray();
-                                                    params.add(extPath)
-                                                            .add(fileId)
-                                                            .add(fileName)
-                                                            .add(originalFileName);
-                                                    connection.updateWithParams("INSERT INTO FileInfo (\n" +
-                                                                    "\textPath,\n" +
-                                                                    "\tfileId,\n" +
-                                                                    "\tfileName,\n" +
-                                                                    "\tfileState,\n" +
-                                                                    "\tfileTempId,\n" +
-                                                                    "\tfileType,\n" +
-                                                                    "\toriginalFileName,\n" +
-                                                                    "\tuploadDateTime,\n" +
-                                                                    "\tversion\n" +
-                                                                    ")\n" +
-                                                                    "VALUES\n" +
-                                                                    "\t(?,?,?,0,null,1,?,now(),0)", params,
-                                                            r -> {
-                                                                System.out.println("sql insert = " + r.succeeded());
-                                                                if (r.failed())
-                                                                    r.cause().printStackTrace();
-                                                            });
-                                                }
-                                            });
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }));
+                                                sqlClient.getConnection(c -> {
+                                                    if (c.succeeded()) {
+                                                        SQLConnection connection = c.result();
+                                                        JsonArray params = new JsonArray();
+                                                        params.add(extPath)
+                                                                .add(fileId)
+                                                                .add(fileName)
+                                                                .add(originalFileName);
+                                                        connection.updateWithParams("INSERT INTO FileInfo (\n" +
+                                                                        "\textPath,\n" +
+                                                                        "\tfileId,\n" +
+                                                                        "\tfileName,\n" +
+                                                                        "\tfileState,\n" +
+                                                                        "\tfileTempId,\n" +
+                                                                        "\tfileType,\n" +
+                                                                        "\toriginalFileName,\n" +
+                                                                        "\tuploadDateTime,\n" +
+                                                                        "\tversion\n" +
+                                                                        ")\n" +
+                                                                        "VALUES\n" +
+                                                                        "\t(?,?,?,0,null,1,?,now(),0)", params,
+                                                                r -> {
+                                                                    System.out.println("sql insert = " + r.succeeded());
+                                                                    if (r.failed())
+                                                                        r.cause().printStackTrace();
+                                                                });
+                                                    }
+                                                });
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        });
+                                    });
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
