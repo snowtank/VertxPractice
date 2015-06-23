@@ -13,8 +13,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <!--<main.class>me.zcx.vertx.cluster.server.VertxClusterMain</main.class>-->
-        <main.verticle>me.zcx.vertx.http.HttpTestServer</main.verticle>
+        <!--<main.class>me.zcx.vertx.http.HttpMain</main.class>-->
+        <main.verticle>me.zcx.vertx.http.HttpTestServer1</main.verticle>
     </properties>
 
     <dependencies>

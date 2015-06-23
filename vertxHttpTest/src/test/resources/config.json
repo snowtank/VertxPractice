@@ -1,0 +1,10 @@
+{
+  "host": "192.168.13.171",
+  "port": 33333,
+  "maxPoolSize": 10,
+  "username": "root",
+  "password": "123456",
+  "database": "filemanage",
+  "showUrl": "http://192.168.13.31:8080/static/",
+  "savePath": "D:/单位项目/vertxTest/VertxPractice/vertxHttpTest/target/classes"
+}

@@ -11,12 +11,12 @@ public final class IterableQueueCommand<T> {
         this.iterator = iterator;
     }
 
-    public IterableQueueCommand onAction(Consumer<IterableQueueCommand> action) {
+    public IterableQueueCommand<T> onAction(Consumer<IterableQueueCommand<T>> action) {
         this.action = action;
         return this;
     }
 
-    public IterableQueueCommand onEnd(Consumer<IterableQueueCommand> end) {
+    public IterableQueueCommand<T> onEnd(Consumer<IterableQueueCommand<T>> end) {
         this.end = end;
         return this;
     }
@@ -40,7 +40,7 @@ public final class IterableQueueCommand<T> {
 
     private T value;
 
-    private Consumer<IterableQueueCommand> action;
-    private Consumer<IterableQueueCommand> end;
+    private Consumer<IterableQueueCommand<T>> action;
+    private Consumer<IterableQueueCommand<T>> end;
     private Iterator<T> iterator;
 }

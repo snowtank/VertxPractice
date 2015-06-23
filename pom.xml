@@ -15,6 +15,7 @@
         <module>vertxHttpTest</module>
         <module>vertxDbTest</module>
         <module>vertxRxTest</module>
+        <module>vertxConfigTest</module>
     </modules>
 
     <packaging>pom</packaging>

@@ -1,13 +1,11 @@
 package me.zcx.vertx.http;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.file.OpenOptions;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.http.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
@@ -19,10 +17,9 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.net.URL;
-import java.net.URLDecoder;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,7 +29,17 @@ import java.util.UUID;
 public class HttpTestServer1 extends AbstractVerticle {
 
     public static void main(String[] args) {
-        Vertx.vertx().deployVerticle("me.zcx.vertx.http.HttpTestServer1");
+        JsonObject config = new JsonObject()
+                .put("host", "192.168.13.171")
+                .put("port", 33333)
+                .put("maxPoolSize", 10)
+                .put("username", "root")
+                .put("password", "123456")
+                .put("database", "filemanage")
+                .put("showUrl", "http://192.168.13.31:8080/static/")
+                .put("savePath", "D:/单位项目/vertxTest/VertxPractice/vertxHttpTest/target/classes");
+        DeploymentOptions options = new DeploymentOptions().setConfig(config);
+        Vertx.vertx().deployVerticle("me.zcx.vertx.http.HttpTestServer1", options);
     }
 
     @Override
@@ -40,12 +47,12 @@ public class HttpTestServer1 extends AbstractVerticle {
         System.setProperty("vertx.disableFileCaching", "true");
 
         JsonObject mySQLClientConfig = new JsonObject()
-                .put("host", "192.168.13.171")
-                .put("port", 33333)
-                .put("maxPoolSize", 10)
-                .put("username", "root")
-                .put("password", "123456")
-                .put("database", "filemanage");
+                .put("host", config().getString("host"))
+                .put("port", config().getInteger("port"))
+                .put("maxPoolSize", config().getInteger("maxPoolSize"))
+                .put("username", config().getString("username"))
+                .put("password", config().getString("password"))
+                .put("database", config().getString("database"));
 
         AsyncSQLClient sqlClient = MySQLClient.createShared(vertx, mySQLClientConfig, "fileManageDB");
 
@@ -55,52 +62,63 @@ public class HttpTestServer1 extends AbstractVerticle {
 
         router.route("/static/*").handler(StaticHandler.create());
 
-        router.route("/api/UEFetchImage").blockingHandler(routingContext -> {
+        router.route("/UEFetchImage").blockingHandler(routingContext -> {
             HttpServerRequest req = routingContext.request();
             HttpServerResponse resp = routingContext.response();
             JsonObject ret = new JsonObject();
             ret.put("state", "SUCCESS");
 
             JsonArray list = new JsonArray();
-            HttpClient client = vertx.createHttpClient();
 
-            @SuppressWarnings("unchecked")
+
             IterableQueueCommand<Map.Entry<String, String>> iqc =
-                    new IterableQueueCommand(
-                            req.params().entries().stream().filter(w -> w.getKey().startsWith("source")).iterator());
+                    new IterableQueueCommand<>(req.params().entries().stream().filter(w -> w.getKey().startsWith("source")).iterator());
 
             iqc.onAction(action -> {
                 try {
-                    String source = ((Map.Entry<String, String>) action.getValue()).getValue();
+                    String source = action.getValue().getValue();
                     URL sourceURL = new URL(source);
-                    URL u = getClassLoader().getResource("");
-
+                    //URL u = getClassLoader().getResource("");
+                    //System.out.println("url is " + u);
                     String originalFileName = FilenameUtils.getName(sourceURL.getPath());
                     String originalFileNameExt = FilenameUtils.getExtension(sourceURL.getPath());
 
                     String fileId = UUID.randomUUID().toString().replace("-", "");
                     String fileName = fileId + "." + originalFileNameExt;
                     String extPath = formatter.format(LocalDate.now());
-                    String savePath = URLDecoder.decode(u.getPath(), "utf-8") + "/webroot/" + extPath + "/";
+                    //String savePath = URLDecoder.decode(u.getPath(), "utf-8") + "/webroot/" + extPath + "/";
+                    String savePath = Paths.get(config().getString("savePath"), extPath).toString();
                     createDir(savePath);
+
+                    HttpClientOptions options;
+                    if ("http".equalsIgnoreCase(sourceURL.getProtocol())) {
+                         options = new HttpClientOptions().setSsl(false);
+                    } else {
+                        options = new HttpClientOptions().setSsl(true);
+                    }
+
+                    HttpClient client = vertx.createHttpClient(options);
 
                     client.getNow(sourceURL.getPort() != -1 ? sourceURL.getPort() : sourceURL.getDefaultPort(),
                             sourceURL.getHost(),
                             sourceURL.getPath(),
                             resp1 -> {
-                                System.out.println(resp1.statusCode());
+                                //System.out.println(resp1.statusCode());
 
                                 resp1.bodyHandler(a -> {
                                     try {
-                                        AsyncFile output = vertx.fileSystem().openBlocking(savePath + fileName, new OpenOptions());
+                                        System.out.println("save = " + savePath + "/" + fileName);
+                                        AsyncFile output = vertx.fileSystem().openBlocking(savePath + "/" + fileName, new OpenOptions());
                                         output.write(a);
                                         output.close();
+
+                                        client.close();
 
                                         list.add(new JsonObject()
                                                 .put("state", "SUCCESS")
                                                 .put("title", fileName)
                                                 .put("source", source)
-                                                .put("url", "http://192.168.13.31:8080/static/" + extPath + "/" + fileName)
+                                                .put("url", config().getString("showUrl") + extPath + "/" + fileName)
                                                 .put("size", a.length()));
 
                                         sqlClient.getConnection(c -> {
@@ -125,7 +143,7 @@ public class HttpTestServer1 extends AbstractVerticle {
                                                                 "VALUES\n" +
                                                                 "\t(?,?,?,0,null,1,?,now(),0)", params,
                                                         r -> {
-                                                            System.out.println("sql insert = " + r.succeeded());
+                                                            //System.out.println("sql insert = " + r.succeeded());
                                                             if (r.failed())
                                                                 r.cause().printStackTrace();
                                                             connection.close(v -> {
@@ -150,7 +168,7 @@ public class HttpTestServer1 extends AbstractVerticle {
                         .append("(")
                         .append(ret.toString())
                         .append(")");
-                System.out.println(sb.toString());
+                // System.out.println(sb.toString());
                 req.response().end(sb.toString());
             }).start();
         });
